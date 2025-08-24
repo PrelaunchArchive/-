@@ -1,0 +1,287 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support — Prelaun.ch</title>
+  <meta name="description" content="Support our Prelaun.ch efforts through donations or hardware contributions.">
+  <meta name="theme-color" content="#0a0f1f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #12172b;
+      --card: #151b35;
+      --accent: #4a90e2;
+      --accent-2: #6b5bff;
+      --text: #e0e6ff;
+      --muted: #a8b4d8;
+      --shadow: 0 10px 40px rgba(0,0,0,.4);
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1100px, 90%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(10,15,31,.75);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, .3);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+    }
+    nav a {
+      font-weight: 500;
+      color: var(--text);
+      opacity: .85;
+    }
+    nav a:hover, nav a.active {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* Main */
+    main {
+      padding: 40px 0;
+    }
+    section {
+      padding: 48px 0;
+    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 700px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(74,144,226,.2);
+    }
+
+    /* Support Container */
+    .support-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .support-item {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .support-item h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .support-item p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .support-item .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+    }
+    .support-item .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+      text-decoration: none;
+    }
+
+    /* Discord Button */
+    .discord-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { gap: 12px; }
+      h2 { font-size: 1.5rem; }
+      .container { width: 95%; }
+      .support-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="catalog.html">Catalog</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="methodology.html">Methodology</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="container">
+        <div class="card">
+          <h2>Support Our Preservation Efforts</h2>
+          <p>Help us preserve PlayStation history by donating to cover server costs, storage, or acquisition of rare firmwares and hardware. Alternatively, contribute by submitting rare hardware or prototypes. Join our Discord to discuss how you can help!</p>
+        </div>
+        <div class="support-container">
+          <div class="support-item">
+            <h3>Donate Financially</h3>
+            <p>Support our efforts through PayPal or Patreon to fund server hosting, firmware acquisitions, and preservation tools.</p>
+            <a href="https://paypal.me/playstationpreservation" class="cta-btn" target="_blank" rel="noopener noreferrer">Donate via PayPal (NOT SUPPORTED!)</a>
+            <a href="https://patreon.com/playstationpreservation" class="cta-btn" style="margin-top: 8px;" target="_blank" rel="noopener noreferrer">Support on Patreon (NOT SUPPORTED!)</a>
+          </div>
+          <div class="support-item">
+            <h3>Contribute Hardware</h3>
+            <p>Have a DECR-1000A, Testkit unit, or rare prototype? Submit details to help expand our collection.</p>
+            <a href="mailto:submithw.prelaun.ch@gmail.com" class="cta-btn">Submit Hardware Details</a>
+          </div>
+        </div>
+        <p style="margin-top: 16px;">Want to discuss other ways to support us? Join our community!</p>
+        <a href="https://discord.gg/Pn4SSvMbVQ" class="discord-btn" target="_blank" rel="noopener noreferrer">Join Our Discord</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

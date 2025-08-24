@@ -1,0 +1,550 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PS Home Versions — Prelaun.ch</title>
+  <meta name="description" content="Explore preserved PlayStation Home client versions for PS3, including official releases, beta versions, and developer options.">
+  <meta name="theme-color" content="#0a0f1f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #12172b;
+      --card: #151b35;
+      --accent: #4a90e2;
+      --accent-2: #6b5bff;
+      --text: #e0e6ff;
+      --muted: #a8b4d8;
+      --shadow: 0 10px 40px rgba(0,0,0,.4);
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1100px, 90%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(10,15,31,.75);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, .3);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+    }
+    nav a {
+      font-weight: 500;
+      color: var(--text);
+      opacity: .85;
+    }
+    nav a:hover, nav a.active {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* Main */
+    main {
+      padding: 40px 0;
+    }
+    section {
+      padding: 48px 0;
+    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 700px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(74,144,226,.2);
+    }
+
+    /* Filter Buttons */
+    .filter-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      background: var(--bg-soft);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-full);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .2s ease, color .2s ease;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+    }
+
+    /* PS Home Container */
+    .pshome-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .pshome-item {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pshome-item h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .pshome-item p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .pshome-item .info-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .pshome-item .info-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: var(--shadow);
+    }
+    .modal-content h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    .modal-content p {
+      font-size: 1rem;
+      color: var(--text);
+      margin: 0 0 16px;
+    }
+    .modal-content .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-content .close-btn:hover {
+      color: var(--accent);
+    }
+
+    /* Discord Button */
+    .discord-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+      text-decoration: none;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--bg-soft);
+      padding: 32px 0;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+    .mini {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .footer-grid ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-grid ul li {
+      margin-bottom: 8px;
+    }
+    .footer-grid strong {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { gap: 12px; }
+      h2 { font-size: 1.5rem; }
+      .container { width: 95%; }
+      .pshome-container { grid-template-columns: 1fr; }
+      .modal-content { width: 95%; }
+      .filter-container { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="catalog.html">Catalog</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="methodology.html">Methodology</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="container">
+        <div class="card">
+          <h2>PlayStation Home Versions</h2>
+          <p>Explore preserved PlayStation Home client versions for PS3, including official releases, beta versions, and developer-enabled builds. These files preserve the legacy of PS Home’s virtual world. Check our <a href="guides.html">Guides</a> for installation instructions or join our Discord for support and contributions!</p>
+        </div>
+        <div class="filter-container">
+          <button class="filter-btn active" data-type="all">All</button>
+          <button class="filter-btn" data-type="official">Official Clients</button>
+          <button class="filter-btn" data-type="beta">Beta Versions</button>
+          <button class="filter-btn" data-type="dev">Dev Options</button>
+        </div>
+        <div class="pshome-container">
+          <div class="pshome-item" data-type="official">
+            <h3>PS Home Client v1.86</h3>
+            <p>Final official client update for PlayStation Home on PS3.</p>
+            <button class="info-btn" data-pshome='{
+              "title": "PS Home Client v1.86",
+              "version": "1.86",
+              "description": "The final official client update for PlayStation Home, released in 2015 before the service shutdown.",
+              "platform": "PlayStation 3",
+              "status": "Fully Preserved",
+              "md5": "example_md5_hash",
+              "size": "Approx. 300MB",
+              "download": "https://example.com/downloads/pshome-1.86.pkg",
+              "usage": "Install via Package Manager on a PS3 with HFW 4.92 or CFW. Requires a compatible firmware and network setup. See Guides for installation instructions. Safety Note: Verify MD5 hash before installation. Only use on compatible PS3 systems."
+            }'>More Info</button>
+          </div>
+          <div class="pshome-item" data-type="official">
+            <h3>PS Home Client v1.75</h3>
+            <p>Official client version with unique virtual spaces.</p>
+            <button class="info-btn" data-pshome='{
+              "title": "PS Home Client v1.75",
+              "version": "1.75",
+              "description": "An official client version of PlayStation Home from 2013, featuring unique virtual spaces and events.",
+              "platform": "PlayStation 3",
+              "status": "Fully Preserved",
+              "md5": "example_md5_hash",
+              "size": "Approx. 250MB",
+              "download": "https://example.com/downloads/pshome-1.75.pkg",
+              "usage": "Install via Package Manager on a PS3 with HFW 4.92 or CFW. Requires compatible firmware. See Guides for setup. Safety Note: Verify MD5 hash and ensure PS3 compatibility."
+            }'>More Info</button>
+          </div>
+          <div class="pshome-item" data-type="beta">
+            <h3>PS Home Beta v0.83</h3>
+            <p>Early beta client for PlayStation Home (2008).</p>
+            <button class="info-btn" data-pshome='{
+              "title": "PS Home Beta v0.83",
+              "version": "0.83",
+              "description": "An early beta client for PlayStation Home, used during the closed beta phase in 2008, featuring limited spaces and features.",
+              "platform": "PlayStation 3",
+              "status": "Partially Preserved",
+              "md5": "example_md5_hash",
+              "size": "Approx. 200MB",
+              "download": "https://example.com/downloads/pshome-beta-0.83.pkg",
+              "usage": "Install via Package Manager on a PS3 with CFW or DECR firmware. Limited functionality due to beta status. See Guides for setup. Safety Note: Verify MD5 hash and use on compatible systems only."
+            }'>More Info</button>
+          </div>
+          <div class="pshome-item" data-type="dev">
+            <h3>PS Home Dev v1.50</h3>
+            <p>Developer-enabled client with debug options.</p>
+            <button class="info-btn" data-pshome='{
+              "title": "PS Home Dev v1.50",
+              "version": "1.50",
+              "description": "A developer-enabled client for PlayStation Home from 2012, including debug menus and testing features for DECR units.",
+              "platform": "PlayStation 3 (DECR)",
+              "status": "Fully Preserved",
+              "md5": "example_md5_hash",
+              "size": "Approx. 280MB",
+              "download": "https://example.com/downloads/pshome-dev-1.50.pkg",
+              "usage": "Install via Package Manager on a PS3 DECR-1000A/J or DECR-1400 with compatible firmware. Requires DECR setup. See Guides for instructions. Safety Note: Do not use on retail PS3s; verify MD5 hash."
+            }'>More Info</button>
+          </div>
+        </div>
+        <p style="margin-top: 16px;">Contribute PS Home files or join our community for support!</p>
+        <a href="https://discord.gg/your-invite-code" class="discord-btn" target="_blank" rel="noopener noreferrer">Join Our Discord</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 10px;">
+          <div class="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+              <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+            </svg>
+          </div>
+          <span>Prelaun.ch</span>
+        </div>
+        <p class="mini">Restoring PlayStation history responsibly. © <span id="y"></span> • All trademarks are property of their respective owners.</p>
+      </div>
+      <div>
+        <strong>Explore</strong>
+        <ul class="mini">
+          <li><a href="#mission">Mission</a></li>
+          <li><a href="#restorations">Restorations</a></li>
+          <li><a href="#join">Get Involved</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong>Contact</strong>
+        <ul class="mini">
+          <li><a href="mailto:playstationpreservation@gmail.com">Tips</a></li>
+          <li><a href="https://discord.gg/your-invite-code">Community</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="pshome-modal">
+    <div class="modal-content">
+      <button class="close-btn">&times;</button>
+      <h3 id="modal-title"></h3>
+      <p id="modal-description"></p>
+      <p><strong>Version:</strong> <span id="modal-version"></span></p>
+      <p><strong>Platform:</strong> <span id="modal-platform"></span></p>
+      <p><strong>Status:</strong> <span id="modal-status"></span></p>
+      <p><strong>MD5 Hash:</strong> <span id="modal-md5"></span></p>
+      <p><strong>File Size:</strong> <span id="modal-size"></span></p>
+      <p><strong>Download:</strong> <a id="modal-download" href="#" target="_blank" rel="noopener noreferrer">Download</a></p>
+      <p><strong>Usage Instructions:</strong> <span id="modal-usage"></span></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const modal = document.getElementById('pshome-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalVersion = document.getElementById('modal-version');
+    const modalPlatform = document.getElementById('modal-platform');
+    const modalStatus = document.getElementById('modal-status');
+    const modalMd5 = document.getElementById('modal-md5');
+    const modalSize = document.getElementById('modal-size');
+    const modalDownload = document.getElementById('modal-download');
+    const modalUsage = document.getElementById('modal-usage');
+    const closeBtn = document.querySelector('.close-btn');
+    const infoButtons = document.querySelectorAll('.info-btn');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const pshomeItems = document.querySelectorAll('.pshome-item');
+
+    infoButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const data = JSON.parse(button.getAttribute('data-pshome'));
+        modalTitle.textContent = data.title;
+        modalDescription.textContent = data.description;
+        modalVersion.textContent = data.version;
+        modalPlatform.textContent = data.platform;
+        modalStatus.textContent = data.status;
+        modalMd5.textContent = data.md5;
+        modalSize.textContent = data.size;
+        modalDownload.href = data.download;
+        modalDownload.textContent = 'Download';
+        modalUsage.textContent = data.usage;
+        modal.style.display = 'flex';
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const type = button.getAttribute('data-type');
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        pshomeItems.forEach(item => {
+          const itemType = item.getAttribute('data-type');
+          item.style.display = type === 'all' || itemType === type ? 'block' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

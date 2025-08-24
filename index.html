@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prelaun.ch</title>
+  <meta name="description" content="A community-driven initiative dedicated to preserving, restoring, and documenting PlayStation prototypes across every generation and genre." />
+  <meta name="theme-color" content="#0a0f1f" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #0f1428;
+      --card: #141a33;
+      --accent: #5aa7ff;
+      --accent-2: #7b5cff;
+      --accent-3: #00e1ff;
+      --text: #e6ecff;
+      --muted: #b5c1e4;
+      --success: #2bd27b;
+      --danger: #ff5577;
+      --warning: #f8b84e;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius-xl: 20px;
+      --radius-2xl: 28px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: radial-gradient(1200px 900px at 70% -10%, rgba(123,92,255,.18), transparent 60%),
+                  radial-gradient(900px 600px at 10% -5%, rgba(0,225,255,.15), transparent 55%),
+                  linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1200px, 92%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(10,15,31,.8), rgba(10,15,31,.5));
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .navbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .3px; }
+    .brand .logo { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background:
+      conic-gradient(from 210deg, var(--accent-2), var(--accent-3), var(--accent) 70%);
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.14), 0 8px 26px rgba(90, 167, 255, .35);
+    }
+    .brand span { font-weight: 900; font-size: 1.05rem; }
+
+    nav ul { display: flex; list-style: none; gap: 18px; padding: 0; margin: 0; }
+    nav a { font-weight: 600; color: var(--text); opacity: .9; }
+    nav a:hover { opacity: 1; }
+
+    .cta { display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: var(--radius-full);
+      background: linear-gradient(90deg, var(--accent-2), var(--accent)); color: #061021; font-weight: 800; box-shadow: var(--shadow);
+      border: none; cursor: pointer; }
+    .cta:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+    /* Hero */
+    .hero { position: relative; overflow: clip; padding: 80px 0 50px; }
+    .hero .glow {
+      position: absolute; inset: -20%;
+      background: radial-gradient(900px 500px at 70% 20%, rgba(90,167,255,.12), transparent 65%),
+                  radial-gradient(700px 400px at 10% 10%, rgba(123,92,255,.12), transparent 60%);
+      filter: blur(20px); pointer-events: none;
+    }
+    .hero-inner { display: grid; grid-template-columns: 1.3fr 1fr; gap: 36px; align-items: center; }
+    .headline { font-size: clamp(1.9rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.1; margin: 0 0 12px; }
+    .sub { color: var(--muted); font-size: 1.05rem; margin-bottom: 24px; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--radius-full);
+      border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); font-weight: 700; }
+    .badge svg { width: 18px; height: 18px; }
+
+    .hero-card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-2xl); padding: 22px; box-shadow: var(--shadow); }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+    .metric { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 14px; }
+    .metric .kpi { font-weight: 900; font-size: 1.3rem; }
+    .metric .label { color: var(--muted); font-size: .9rem; }
+
+    .hero-art { position: relative; aspect-ratio: 1.1/1; border-radius: var(--radius-2xl);
+      background:
+        radial-gradient(120px 120px at 20% 20%, rgba(0,225,255,.25), transparent 60%),
+        radial-gradient(150px 150px at 80% 30%, rgba(123,92,255,.25), transparent 60%),
+        linear-gradient(140deg, #0d1330, #0b1d39);
+      border: 1px solid rgba(255,255,255,.1); box-shadow: var(--shadow);
+      display: grid; place-items: center; overflow: hidden;
+    }
+    .disc {
+      width: 72%; aspect-ratio: 1; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, #a8b1ff 40%, #6bc9ff 60%, #2b8bff 70%, #0e2a80 90%);
+      mask: radial-gradient(circle at 50% 50%, black 62%, transparent 64%);
+      position: relative; box-shadow: inset 0 0 40px rgba(255,255,255,.2), 0 20px 80px rgba(90,167,255,.25);
+      animation: spin 18s linear infinite;
+    }
+    .disc::after { content: ""; position: absolute; inset: 6% 6%; border-radius: 50%; border: 2px dashed rgba(255,255,255,.2); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Sections */
+    section { padding: 64px 0; }
+    .section-title { font-size: 1.6rem; font-weight: 900; margin: 0 0 10px; }
+    .section-sub { color: var(--muted); margin-bottom: 28px; }
+
+    .grid { display: grid; gap: 18px; }
+    @media (min-width: 720px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-2 { grid-template-columns: repeat(2, 1fr); } }
+
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius-xl); padding: 20px; transition: transform .2s ease, box-shadow .3s ease, border-color .2s ease; }
+    .card:hover { transform: translateY(-3px); border-color: rgba(123,92,255,.4); box-shadow: 0 12px 48px rgba(123,92,255,.2); }
+
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08); font-weight: 700; font-size: .8rem; color: var(--muted); }
+
+    /* Timeline */
+    .timeline { position: relative; margin: 10px 0; }
+    .timeline::before { content: ""; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent), transparent); }
+    .t-item { position: relative; padding-left: 42px; margin-bottom: 18px; }
+    .t-item::before { content: ""; position: absolute; left: 5px; top: 6px; width: 16px; height: 16px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent)); box-shadow: 0 6px 18px rgba(90,167,255,.6);
+      border: 2px solid rgba(255,255,255,.25);
+    }
+
+    /* FAQ */
+    .faq button { width: 100%; text-align: left; padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05); color: var(--text); font-weight: 700; cursor: pointer; }
+    .faq button:hover { border-color: rgba(90,167,255,.6); }
+    .faq .panel { max-height: 0; overflow: hidden; transition: max-height .35s ease; padding: 0 14px; }
+    .faq .panel.open { padding: 14px; }
+
+    /* Footer */
+    footer { padding: 40px 0; border-top: 1px solid rgba(255,255,255,.1); background: linear-gradient(180deg, transparent, rgba(255,255,255,.03)); }
+    .footer-grid { display: grid; gap: 18px; grid-template-columns: 1.1fr .9fr .9fr; }
+    .mini { color: var(--muted); font-size: .92rem; }
+
+    /* Utilities */
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .spacer { height: 18px; }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: var(--radius-full);
+      background: rgba(255,255,255,.06); color: var(--text); font-weight: 800; border: 1px solid rgba(255,255,255,.14); cursor: pointer; }
+    .btn-secondary:hover { border-color: rgba(123,92,255,.6); }
+
+    /* Responsive tweaks */
+    @media (max-width: 960px) { .hero-inner { grid-template-columns: 1fr; } nav ul { display: none; } }
+
+    /* Toggle */
+    .toggle { width: 50px; height: 28px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; position: relative; cursor: pointer; }
+    .knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left .25s ease; }
+    body.light { background: #f7f9ff; color: #0f1533; }
+    body.light header { background: rgba(255,255,255,.85); }
+    body.light .card, body.light .hero-card { background: #fff; border-color: rgba(0,0,0,.08); }
+    body.light .metric, body.light .faq button { background: #fff; border-color: rgba(0,0,0,.08); }
+    body.light .brand .logo { box-shadow: inset 0 0 0 2px rgba(0,0,0,.06), 0 8px 26px rgba(90,167,255,.25); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand" aria-label="Organization brand">
+        <div class="logo" aria-hidden="true">
+          <!-- PS-like shapes -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="1" y="10" width="8" height="8" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="18" cy="14" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="mission.html">Mission</a></li>
+          <li><a href="focus.html">Focus</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="join.html">Get Involved</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </nav>
+      <div class="row">
+        <div id="themeToggle" class="toggle" role="switch" aria-checked="false" aria-label="Toggle light mode"><div class="knob"></div></div>
+        <button class="cta" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">
+          <!-- download icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.17l3.59-3.58L17 11l-5 5-5-5 1.41-1.41L11 13.17V3h1zM5 18h14v2H5v-2z"/></svg>
+          Contribute
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="glow" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <div>
+          <div class="badge" aria-label="Badge: All generations, all genres">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6 6 .9-4.5 4.4L17.9 20 12 16.9 6.1 20l1.4-6.7L3 8.9 9 8l3-6z"/></svg>
+            All generations • All genres
+          </div>
+          <h1 class="headline">Prelaun.ch<br>— pixel by pixel, byte by byte.</h1>
+          <p class="sub">Our mission is to locate, preserve, and fully restore every known PlayStation prototype: from early tech demos and unreleased builds to debug hardware and marketing discs. We document everything, keep it legal, and share our learnings with the world.</p>
+          <div class="row">
+            <a class="btn-secondary" href="restorations.html">View Recent Restorations</a>
+            <a class="btn-secondary" href="join.html">How You Can Help</a>
+          </div>
+
+          <div class="hero-card" aria-label="Highlights">
+            <div class="row" style="justify-content: space-between;">
+              <span class="chip">PS1 • PS2 • PS3 • PSP • PS Vita • PS4</span>
+              <span class="chip">Hardware • Software • Marketing</span>
+            </div>
+            <div class="metrics" role="list">
+              <div class="metric" role="listitem"><div class="kpi" id="kpi-found">312</div><div class="label">Prototypes cataloged</div></div>
+			  <div class="metric" role="listitem"><div class="kpi" id="kpi-found">312</div><div class="label">Firmwares cataloged</div></div>
+              <div class="metric" role="listitem"><div class="kpi" id="kpi-restored">147</div><div class="label">Fully restored</div></div>
+              <div class="metric" role="listitem"><div class="kpi" id="kpi-community">1,980+</div><div class="label">Community members</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="disc"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission -->
+    <section id="mission">
+      <div class="container">
+        <h2 class="section-title">Our Mission</h2>
+        <p class="section-sub">We safeguard the history of PlayStation by identifying rare and unreleased materials, verifying their provenance, and restoring them to a usable, documented state while respecting legal and ethical standards.</p>
+        <div class="grid grid-3">
+          <article class="card">
+            <h3>Preserve</h3>
+            <p>Secure acquisition, clean imaging, and bit-perfect verification of discs, carts, and development media. Redundant storage with integrity checks.</p>
+            <span class="chip">Checksums</span> <span class="chip">KryoFlux / Redump</span>
+          </article>
+          <article class="card">
+            <h3>Restore</h3>
+            <p>Non-destructive repairs for corrupted assets, filesystem rebuilds, and rebuildable SDK projects with reproducible toolchains.</p>
+            <span class="chip">SDK Toolchains</span> <span class="chip">Asset Recovery</span>
+          </article>
+          <article class="card">
+            <h3>Document</h3>
+            <p>Change logs, build diffs, screenshots, timelines, and developer notes, published in a research-friendly format.</p>
+            <span class="chip">Diff Reports</span> <span class="chip">Metadata</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Focus Areas -->
+    <section id="focus">
+      <div class="container">
+        <h2 class="section-title">Focus Areas</h2>
+        <p class="section-sub">From tech demos to marketing discs — if it ran on PlayStation, we care about it.</p>
+        <div class="grid grid-3">
+          <article class="card">
+            <h3>Software Prototypes</h3>
+            <p>Unreleased builds, E3 demos, kiosk discs, debug and review builds across PS1–PS4.</p>
+            <span class="chip">Alpha • Beta • Gold Master</span>
+          </article>
+          <article class="card">
+            <h3>Hardware & Devkits</h3>
+            <p>Test units, NPDP/TOOL/DECR/DECHA, early controllers, and engineering samples. Safe teardown + photography.</p>
+            <span class="chip">For Research</span>
+          </article>
+          <article class="card">
+            <h3>Artifacts & Media</h3>
+            <p>Promo builds, press kits, store assets, and documentation that complete the historical picture.</p>
+            <span class="chip">Context Matters</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Restorations -->
+    <section id="restorations">
+      <div class="container">
+        <h2 class="section-title">Recent Restorations</h2>
+        <p class="section-sub">A snapshot of work-in-progress and finished restorations. Replace placeholders with your real data as you grow.</p>
+        <div class="grid grid-3">
+          <article class="card">
+            <div class="chip">PS2 • 2003</div>
+            <h3>Project "Aegis" E3 Demo</h3>
+            <p>Recovered corrupted BGC textures, rebuilt ELF, and restored controller mappings. Verified deterministic build with SDK 2.6 toolchain.</p>
+            <div class="row">
+              <span class="chip">Status: Complete</span>
+              <span class="chip" style="color: var(--success);">Playable</span>
+            </div>
+          </article>
+          <article class="card">
+            <div class="chip">PSP • 2006</div>
+            <h3>Kiosk Disc K-214b</h3>
+            <p>Reconstructed UMD LBA order and fixed PMF playback desync. Added full metadata and gallery.</p>
+            <div class="row">
+              <span class="chip">Status: In review</span>
+              <span class="chip">Video OK</span>
+            </div>
+          </article>
+          <article class="card">
+            <div class="chip">PS1 • 1997</div>
+            <h3>Platformer Prototype R7</h3>
+            <p>Disc rot mitigation via multiple reads; combined best sectors. Patched XA audio table and corrected sector EDC/ECC.</p>
+            <div class="row">
+              <span class="chip">Status: Complete</span>
+              <span class="chip">Audio Fixed</span>
+            </div>
+          </article>
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <a class="btn-secondary" href="catalog.html">Browse Full Catalog of Prototypes</a>
+		  <a class="btn-secondary" href="firmwares.html">Browse Full Catalog of Firmwares</a>
+		  <a class="btn-secondary" href="PSHomeVer.html">Browse Full Catalog of PS Home Apps</a>
+          <a class="btn-secondary" href="Methodology.html">Read Methodology</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Roadmap / Timeline -->
+    <section>
+      <div class="container">
+        <h2 class="section-title">Roadmap</h2>
+        <p class="section-sub">Clear, measurable steps to restore every prototype we can ethically source.</p>
+        <div class="timeline">
+          <div class="t-item card">
+            <strong>Phase 1 — Catalog & Intake</strong>
+            <p>Submit leads, verify provenance, image media, compute hashes, and store with redundancy.</p>
+            <div class="row"><span class="chip">Now</span><span class="chip">Open</span></div>
+          </div>
+          <div class="t-item card">
+            <strong>Phase 2 — Toolchains</strong>
+            <p>Rebuild historical SDKs in reproducible containers. Create build scripts and diffable outputs.</p>
+            <div class="row"><span class="chip">Q3</span><span class="chip">In Progress</span></div>
+          </div>
+          <div class="t-item card">
+            <strong>Phase 3 — Publishing & Docs</strong>
+            <p>Write detailed reports, galleries, and changelogs. Release legal-safe materials and research notes.</p>
+            <div class="row"><span class="chip">Q4</span><span class="chip">Upcoming</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Join / Contribute -->
+<section id="join">
+  <div class="container">
+    <h2 class="section-title">Get Involved</h2>
+    <p class="section-sub">There are many ways to help — whether you have hardware to loan, a disc to dump, or skills to contribute.</p>
+    <div class="grid grid-3">
+      
+      <article class="card">
+        <h3>Submit a Lead</h3>
+        <p>Know about a prototype, devkit, or related material? Share your lead privately. We treat every tip with care.</p>
+        <a href="submit-lead.html" class="cta">Submit Lead</a>
+      </article>
+
+      <article class="card">
+        <h3>Volunteer</h3>
+        <p>Help with imaging, reverse engineering, writing, or photography. Beginners welcome — we mentor.</p>
+        <a href="volunteer.html" class="btn-secondary">Become a Volunteer</a>
+      </article>
+
+      <article class="card">
+        <h3>Support</h3>
+        <p>Fund storage, shipping, and preservation equipment. Transparent budget and impact reports.</p>
+        <a href="support.html" class="btn-secondary">Support the Mission</a>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <h2 class="section-title">FAQ</h2>
+        <div class="faq grid grid-2">
+          <article class="card">
+            <button aria-expanded="false">Do you release prototype content?</button>
+            <div class="panel"><p>We publish documentation, images, and research notes. Any release of binaries follows a strict legal and ethical review, and may be limited to metadata and diffs only.</p></div>
+          </article>
+          <article class="card">
+            <button aria-expanded="false">How do you verify authenticity?</button>
+            <div class="panel"><p>Multiple imaging passes, checksum consensus, provenance checks, and build reproducibility. Where possible, we confirm against developer notes and SDK toolchains.</p></div>
+          </article>
+          <article class="card">
+            <button aria-expanded="false">Can I donate hardware or discs?</button>
+            <div class="panel"><p>Yes. We support secure shipping/return workflows and provide imaging receipts and reports. Start with a lead submission so we can coordinate safely.</p></div>
+          </article>
+          <article class="card">
+            <button aria-expanded="false">Will you work with the press?</button>
+            <div class="panel"><p>We’re happy to provide quotes and historical context. Contact us with your story angle; we’ll respond with available assets and timelines.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 10px;">
+          <div class="logo" aria-hidden="true"></div>
+          <span>Prototype Restoration Initiative</span>
+        </div>
+        <p class="mini">Restoring PlayStation history responsibly. © <span id="y"></span> • All trademarks are property of their respective owners.</p>
+      </div>
+      <div>
+        <strong>Explore</strong>
+        <ul class="mini">
+          <li><a href="mission.html">Mission</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="join.html">Get Involved</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong>Contact</strong>
+        <ul class="mini">
+          <li><a href="prelaun.ch.press@gmail.com" onclick="alert">Press</a></li>
+          <li><a href="prelaun.ch.tips@gmail.com" onclick="alert">Tips</a></li>
+          <li><a href="https://discord.gg/Pn4SSvMbVQ" onclick="alert">Community</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Theme toggle
+    const toggle = document.getElementById('themeToggle');
+    const knob = toggle.querySelector('.knob');
+    const setMode = (light) => {
+      document.body.classList.toggle('light', light);
+      toggle.setAttribute('aria-checked', light ? 'true' : 'false');
+      knob.style.left = light ? '25px' : '3px';
+      localStorage.setItem('pri-theme', light ? 'light' : 'dark');
+    };
+    setMode(localStorage.getItem('pri-theme') === 'light');
+    toggle.addEventListener('click', () => setMode(!document.body.classList.contains('light')));
+
+    // FAQ accordion
+    document.querySelectorAll('#faq button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = btn.nextElementSibling;
+        const open = panel.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        panel.style.maxHeight = open ? panel.scrollHeight + 'px' : 0;
+      });
+    });
+
+    // Demo counters (replace with real data source or remove)
+    const animateCount = (el, target, duration=1200) => {
+      const start = 0; const range = target - start; const startTime = performance.now();
+      const step = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const val = Math.floor(start + range * (1 - Math.pow(1 - progress, 3))); // ease-out-cubic
+        el.textContent = val.toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    animateCount(document.getElementById('kpi-found'), 312);
+    animateCount(document.getElementById('kpi-restored'), 147);
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta Prelaun.charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission — Prelaun.ch</title>
+  <meta name="description" content="Learn about our mission to preserve and document PlayStation prototypes, safeguarding gaming history across all generations.">
+  <meta name="theme-color" content="#0a0f1f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #12172b;
+      --card: #151b35;
+      --accent: #4a90e2;
+      --accent-2: #6b5bff;
+      --text: #e0e6ff;
+      --muted: #a8b4d8;
+      --shadow: 0 10px 40px rgba(0,0,0,.4);
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1100px, 90%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(10,15,31,.75);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, .3);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+    }
+    nav a {
+      font-weight: 500;
+      color: var(--text);
+      opacity: .85;
+    }
+    nav a:hover, nav a.active {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* Main */
+    main {
+      padding: 40px 0;
+    }
+    section {
+      padding: 48px 0;
+    }
+    .hero h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 800px;
+    }
+    .content h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 24px 0 12px;
+    }
+    .content p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 700px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(74,144,226,.2);
+    }
+
+    /* Footer */
+    footer {
+      padding: 24px 0;
+      border-top: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.02);
+    }
+    footer p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+      margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { gap: 12px; }
+      .hero h2 { font-size: 1.8rem; }
+      .content h3 { font-size: 1.2rem; }
+      .container { width: 95%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="catalog.html">Catalog</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="focus.html">Focus</a></li>
+          <li><a href="mission.html" class="active">Mission</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="join.html">Join</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="card">
+          <h2>Our Mission</h2>
+          <p>We are dedicated to preserving the legacy of PlayStation by recovering, restoring, and documenting every prototype across all generations, ensuring that gaming history is safeguarded for future generations.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="container">
+        <div class="card">
+          <h3>Our Commitment</h3>
+          <p>Our mission is to meticulously locate, preserve, and restore PlayStation prototypes, including early builds, debug hardware, and pre-release media, while adhering to ethical and legal standards. We aim to create a comprehensive, researPrelaun.ch-friendly arPrelaun.chive that documents the development history of PlayStation platforms, from PlayStation 1 to PlayStation 5, including handhelds like PSP and PS Vita. By collaborating with the global gaming community, we strive to share knowledge, protect rare artifacts, and celebrate the innovation of PlayStation.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 Prelaun.Prelaun.ch. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

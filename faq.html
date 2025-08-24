@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ — Prelaun.ch</title>
+  <meta name="description" content="Find answers to common questions about our work in preserving and documenting PlayStation prototypes across all generations.">
+  <meta name="theme-color" content="#0a0f1f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #12172b;
+      --card: #151b35;
+      --accent: #4a90e2;
+      --accent-2: #6b5bff;
+      --text: #e0e6ff;
+      --muted: #a8b4d8;
+      --shadow: 0 10px 40px rgba(0,0,0,.4);
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1100px, 90%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(10,15,31,.75);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, .3);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+    }
+    nav a {
+      font-weight: 500;
+      color: var(--text);
+      opacity: .85;
+    }
+    nav a:hover {
+      opacity: 1;
+    }
+
+    /* Main */
+    main {
+      padding: 40px 0;
+    }
+    section {
+      padding: 48px 0;
+    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 700px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(74,144,226,.2);
+    }
+
+    /* FAQ */
+    .faq-container {
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .faq-item {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .faq-item button {
+      width: 100%;
+      text-align: left;
+      padding: 16px;
+      background: rgba(255,255,255,.05);
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+    .faq-item button:hover {
+      background: rgba(255,255,255,.1);
+    }
+    .faq-item .panel {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 16px;
+      transition: max-height .3s ease, padding .3s ease;
+    }
+    .faq-item .panel.open {
+      max-height: 200px; /* Adjust based on content */
+      padding: 16px;
+    }
+    .faq-item .panel p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { gap: 12px; }
+      h2 { font-size: 1.5rem; }
+      .container { width: 95%; }
+      .faq-item .panel.open { max-height: 300px; } /* Adjust for smaller screens */
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="catalog.html">Catalog</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="faq.html" class="active">FAQ</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="container">
+        <div class="card">
+          <h2>Frequently Asked Questions</h2>
+          <p>Find answers to common questions about our efforts to preserve and document PlayStation prototypes across all generations and genres.</p>
+        </div>
+        <div class="faq-container">
+          <div class="faq-item">
+            <button aria-expanded="false">What types of prototypes do you preserve?</button>
+            <div class="panel">
+              <p>We preserve a wide range of PlayStation prototypes, including early builds, unreleased games, debug hardware, development kits, concept demos, and pre-release discs or cartridges across all PlayStation platforms (PS1 to PS5, including PSP and PS Vita).</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button aria-expanded="false">How do you ensure the authenticity of prototypes?</button>
+            <div class="panel">
+              <p>We verify authenticity through multiple imaging passes, checksum validation, provenance checks, and, where possible, confirmation against developer notes or SDK toolchains to ensure accuracy and integrity.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button aria-expanded="false">Can I donate prototypes or hardware?</button>
+            <div class="panel">
+              <p>Yes, we welcome donations of prototypes, discs, or hardware. We provide secure shipping and return workflows, along with detailed imaging receipts and reports. Please submit a lead via our contact page to coordinate.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button aria-expanded="false">Do you share preserved prototype content?</button>
+            <div class="panel">
+              <p>We share documentation, metadata, and research notes publicly. Any release of binaries or other content is subject to strict legal and ethical reviews, often limited to metadata or build differences to respect intellectual property.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // FAQ accordion functionality
+    document.querySelectorAll('.faq-item button').forEach(button => {
+      button.addEventListener('click', () => {
+        const panel = button.nextElementSibling;
+        const isOpen = panel.classList.contains('open');
+        // Close all panels
+        document.querySelectorAll('.faq-item .panel').forEach(p => {
+          p.classList.remove('open');
+          p.style.maxHeight = '0';
+          p.previousElementSibling.setAttribute('aria-expanded', 'false');
+        });
+        // Open clicked panel if it wasn't already open
+        if (!isOpen) {
+          panel.classList.add('open');
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+          button.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

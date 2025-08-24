@@ -1,0 +1,468 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcade (GEX) Firmwares — Prelaun.ch</title>
+  <meta name="description" content="Explore preserved Arcade (GEX) firmwares for PlayStation-based arcade systems, including Namco System 357/369 builds.">
+  <meta name="theme-color" content="#0a0f1f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #12172b;
+      --card: #151b35;
+      --accent: #4a90e2;
+      --accent-2: #6b5bff;
+      --text: #e0e6ff;
+      --muted: #a8b4d8;
+      --shadow: 0 10px 40px rgba(0,0,0,.4);
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1100px, 90%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(10,15,31,.75);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, .3);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+    }
+    nav a {
+      font-weight: 500;
+      color: var(--text);
+      opacity: .85;
+    }
+    nav a:hover, nav a.active {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* Main */
+    main {
+      padding: 40px 0;
+    }
+    section {
+      padding: 48px 0;
+    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 700px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(74,144,226,.2);
+    }
+
+    /* Arcade GEX Containers */
+    .gex-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .gex-item {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .gex-item h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .gex-item p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .gex-item .info-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+    }
+    .gex-item .info-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+      text-decoration: none;
+    }
+
+    /* Popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-content {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+    .popup-content img {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      object-fit: cover;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+    .popup-content h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    .popup-content p {
+      font-size: 0.95rem;
+      margin: 8px 0;
+    }
+    .popup-content .close-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .popup-content .close-btn:hover {
+      color: var(--accent);
+    }
+    .popup-content .download-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      margin-top: 16px;
+      text-align: center;
+    }
+    .popup-content .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { gap: 12px; }
+      h2 { font-size: 1.5rem; }
+      .container { width: 95%; }
+      .gex-container { grid-template-columns: 1fr; }
+      .popup-content img { width: 80px; height: 80px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="catalog.html">Catalog</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="methodology.html">Methodology</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="container">
+        <div class="card">
+          <h2>Arcade (GEX) Firmwares</h2>
+          <p>Explore our collection of preserved Arcade (GEX) firmwares for PlayStation-based arcade systems, such as Namco System 357/369, used in arcade cabinets for games like Tekken 6.</p>
+        </div>
+        <div class="gex-container">
+          <div class="gex-item">
+            <h3>Arcade (GEX) v2.51</h3>
+            <p>Early firmware for Namco System 357A arcade systems.</p>
+            <button class="info-btn" data-gex='{
+              "title": "Arcade (GEX) v2.51",
+              "version": "2.51",
+              "description": "An early firmware build for Namco System 357A, featuring NAND flash support and arcade-specific configurations.",
+              "platform": "PlayStation 3 (Namco System 357A)",
+              "status": "Fully Preserved",
+              "md5": "87a6d90352c3b184325c38e74c81caae",
+              "size": "117MB",
+              "download": "https://example.com/downloads/gex-v2.51.bin",
+              "icon": "https://via.placeholder.com/120"
+            }'>More Info</button>
+          </div>
+          <div class="gex-item">
+            <h3>Arcade (GEX) v3.60</h3>
+            <p>Firmware for Namco System 357/369 with arcade optimizations.</p>
+            <button class="info-btn" data-gex='{
+              "title": "Arcade (GEX) v3.60",
+              "version": "3.60",
+              "description": "Firmware for Namco System 357/369, optimized for arcade use with support for NOR flash and game-specific dongles.",
+              "platform": "PlayStation 3 (Namco System 357/369)",
+              "status": "Fully Preserved",
+              "md5": "49a1f22f7adaf92c6e6e4c3661786dc4",
+              "size": "139MB",
+              "download": "https://example.com/downloads/gex-v3.60.bin",
+              "icon": "https://via.placeholder.com/120"
+            }'>More Info</button>
+          </div>
+          <div class="gex-item">
+            <h3>Arcade (GEX) v3.70</h3>
+            <p>Updated firmware for arcade systems with enhanced stability.</p>
+            <button class="info-btn" data-gex='{
+              "title": "Arcade (GEX) v3.70",
+              "version": "3.70",
+              "description": "An updated firmware for Namco System 357/369, improving stability and compatibility with arcade games like Tekken 6.",
+              "platform": "PlayStation 3 (Namco System 357/369)",
+              "status": "Fully Preserved",
+              "md5": "82692cf85dfef6ac23297758d4e744f8",
+              "size": "140MB",
+              "download": "https://example.com/downloads/gex-v3.70.bin",
+              "icon": "https://via.placeholder.com/120"
+            }'>More Info</button>
+          </div>
+          <div class="gex-item">
+            <h3>Arcade (GEX) v4.40</h3>
+            <p>Firmware with eid0 signature check for later systems.</p>
+            <button class="info-btn" data-gex='{
+              "title": "Arcade (GEX) v4.40",
+              "version": "4.40",
+              "description": "Firmware for Namco System 357C/369 with eid0 signature check, requiring patched lv1ldr for conversions.",
+              "platform": "PlayStation 3 (Namco System 357C/369)",
+              "status": "Fully Preserved",
+              "md5": "ff80eb8c48a5232328bd88ec35b4a088",
+              "size": "152MB",
+              "download": "https://example.com/downloads/gex-v4.40.bin",
+              "icon": "https://via.placeholder.com/120"
+            }'>More Info</button>
+          </div>
+          <div class="gex-item">
+            <h3>Arcade (GEX) v4.50</h3>
+            <p>Firmware supporting NOR flash arcade systems.</p>
+            <button class="info-btn" data-gex='{
+              "title": "Arcade (GEX) v4.50",
+              "version": "4.50",
+              "description": "Firmware for Namco System 357C/369 with NOR flash support, used in arcade setups with JVS I/O boards.",
+              "platform": "PlayStation 3 (Namco System 357C/369)",
+              "status": "Fully Preserved",
+              "md5": "8de8f54c3173264b15cc3d84b49f144f",
+              "size": "152MB",
+              "download": "https://example.com/downloads/gex-v4.50.bin",
+              "icon": "https://via.placeholder.com/120"
+            }'>More Info</button>
+          </div>
+          <div class="gex-item">
+            <h3>Arcade (GEX) v4.70</h3>
+            <p>Latest GEX firmware for modern arcade cabinets.</p>
+            <button class="info-btn" data-gex='{
+              "title": "Arcade (GEX) v4.70",
+              "version": "4.70",
+              "description": "The latest GEX firmware for Namco System 357C/369, supporting modern arcade cabinets with enhanced game compatibility.",
+              "platform": "PlayStation 3 (Namco System 357C/369)",
+              "status": "Fully Preserved",
+              "md5": "5addd20173bfb15b6e18461b8f928027",
+              "size": "153MB",
+              "download": "https://example.com/downloads/gex-v4.70.bin",
+              "icon": "https://via.placeholder.com/120"
+            }'>More Info</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popup -->
+    <div class="popup" id="gex-popup">
+      <div class="popup-content">
+        <button class="close-btn" aria-label="Close popup">✕</button>
+        <img id="popup-icon" src="" alt="Arcade GEX Icon">
+        <h3 id="popup-title"></h3>
+        <p><strong>Version:</strong> <span id="popup-version"></span></p>
+        <p><strong>Platform:</strong> <span id="popup-platform"></span></p>
+        <p><strong>Status:</strong> <span id="popup-status"></span></p>
+        <p><strong>MD5 Hash:</strong> <span id="popup-md5"></span></p>
+        <p><strong>File Size:</strong> <span id="popup-size"></span></p>
+        <p><strong>Description:</strong> <span id="popup-description"></span></p>
+        <a href="#" id="popup-download" class="download-btn" target="_blank" rel="noopener noreferrer">Download</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Popup functionality
+    const popup = document.getElementById('gex-popup');
+    const closeBtn = document.querySelector('.close-btn');
+    const infoBtns = document.querySelectorAll('.info-btn');
+
+    infoBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const data = JSON.parse(btn.getAttribute('data-gex'));
+        document.getElementById('popup-icon').src = data.icon;
+        document.getElementById('popup-title').textContent = data.title;
+        document.getElementById('popup-version').textContent = data.version;
+        document.getElementById('popup-platform').textContent = data.platform;
+        document.getElementById('popup-status').textContent = data.status;
+        document.getElementById('popup-md5').textContent = data.md5;
+        document.getElementById('popup-size').textContent = data.size;
+        document.getElementById('popup-description').textContent = data.description;
+        document.getElementById('popup-download').href = data.download;
+        popup.style.display = 'flex';
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        popup.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

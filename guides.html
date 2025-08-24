@@ -1,0 +1,505 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guides — Prelaun.ch</title>
+  <meta name="description" content="Explore step-by-step guides for verifying, installing, and using PlayStation firmwares and tools for preservation and homebrew.">
+  <meta name="theme-color" content="#0a0f1f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1f;
+      --bg-soft: #12172b;
+      --card: #151b35;
+      --accent: #4a90e2;
+      --accent-2: #6b5bff;
+      --text: #e0e6ff;
+      --muted: #a8b4d8;
+      --shadow: 0 10px 40px rgba(0,0,0,.4);
+      --radius-lg: 16px;
+      --radius-full: 999px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060913, var(--bg));
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(1100px, 90%); margin: 0 auto; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background: rgba(10,15,31,.75);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .brand .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, .3);
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+    }
+    nav a {
+      font-weight: 500;
+      color: var(--text);
+      opacity: .85;
+    }
+    nav a:hover, nav a.active {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    /* Main */
+    main {
+      padding: 40px 0;
+    }
+    section {
+      padding: 48px 0;
+    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 700px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(74,144,226,.2);
+    }
+
+    /* Guides Container */
+    .guides-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .guide-item {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .guide-item h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .guide-item p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .guide-item .info-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .guide-item .info-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: var(--shadow);
+    }
+    .modal-content h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    .modal-content p {
+      font-size: 1rem;
+      color: var(--text);
+      margin: 0 0 16px;
+    }
+    .modal-content .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-content .close-btn:hover {
+      color: var(--accent);
+    }
+
+    /* Discord Button */
+    .discord-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      box-shadow: 0 4px 16px rgba(74, 144, 226, .3);
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(74, 144, 226, .4);
+      text-decoration: none;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--bg-soft);
+      padding: 32px 0;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+    .mini {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .footer-grid ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-grid ul li {
+      margin-bottom: 8px;
+    }
+    .footer-grid strong {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { gap: 12px; }
+      h2 { font-size: 1.5rem; }
+      .container { width: 95%; }
+      .guides-container { grid-template-columns: 1fr; }
+      .modal-content { width: 95%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="brand">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+            <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>Prelaun.ch</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="catalog.html">Catalog</a></li>
+          <li><a href="restorations.html">Restorations</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="methodology.html">Methodology</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="container">
+        <div class="card">
+          <h2>Prelaun.ch Guides</h2>
+          <p>Explore step-by-step tutorials for verifying, installing, and using PlayStation firmwares and homebrew tools. Learn how to safely handle DECR, Testkit, or Arcade GEX firmwares, verify MD5 hashes, and set up tools like PKG Linker. Join our Discord for additional support!</p>
+        </div>
+        <div class="guides-container">
+          <div class="guide-item">
+            <h3>Verifying Firmware MD5 Hashes</h3>
+            <p>Use tools like md5sum or PS3_Firmware_Checker to ensure firmware authenticity.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Verifying Firmware MD5 Hashes",
+              "tutorial": "Ensuring the authenticity of firmware files is critical to avoid corrupted or malicious files. Follow these steps to verify MD5 hashes:\n\n1. Download a trusted MD5 hash tool, such as md5sum (Windows/Linux) or PS3_Firmware_Checker.\n2. Obtain the official MD5 hash for the firmware from a reliable source, such as our DECRFW or TestkitFW pages.\n3. Run the command `md5sum firmware.pup` (Linux) or use the tool’s GUI to compute the hash of your downloaded file.\n4. Compare the computed hash with the official hash. If they match, the file is authentic.\n5. If hashes differ, do not use the file; re-download from a trusted source.\n\nSafety Note: Always verify hashes before flashing to avoid bricking your console. Never use files from untrusted sources."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Installing DECR Firmware</h3>
+            <p>Safely flash DECR v3.55 or v4.81 on PS3 Reference Tool (DECR-1000A/J, DECR-1400).</p>
+            <button class="info-btn" data-guide='{
+              "title": "Installing DECR Firmware",
+              "tutorial": "Flashing DECR firmware on a PS3 Reference Tool (DECR-1000A/J or DECR-1400) requires caution to avoid bricking. Follow these steps:\n\n1. Confirm your unit is a DECR-1000A/J or DECR-1400, not a retail PS3.\n2. Download the DECR firmware (e.g., v3.55) from our DECRFW page and verify its MD5 hash.\n3. Format a USB drive to FAT32 and create a folder structure: PS3/UPDATE.\n4. Copy the firmware file (PS3UPDAT.PUP) to the UPDATE folder.\n5. Insert the USB into the DECR unit and boot into Recovery Mode (power off, hold power button until second beep).\n6. Select ‘System Update’ and follow prompts to install.\n7. After installation, verify the firmware version in System Settings.\n\nSafety Note: Do not interrupt the update process. Using DECR firmware on retail PS3s will brick the console. Ensure compatibility before proceeding."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Setting Up Arcade GEX Firmware</h3>
+            <p>Guide to installing Namco System 357/369 firmwares (e.g., v4.50) on arcade units.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Setting Up Arcade GEX Firmware",
+              "tutorial": "Namco System 357/369 arcade units use specialized PS3-based firmwares. Follow these steps to install Arcade GEX firmware (e.g., v4.50):\n\n1. Verify your unit is a Namco System 357 or 369.\n2. Download the Arcade GEX firmware from our Arcade GEX page and verify its MD5 hash.\n3. Format a USB drive to FAT32 and create a folder structure: PS3/UPDATE.\n4. Copy the firmware file (PS3UPDAT.PUP) to the UPDATE folder.\n5. Insert the USB into the arcade unit and power it on.\n6. Access the System Update menu via the arcade’s service mode (consult unit manual).\n7. Follow prompts to install the firmware.\n8. Verify the firmware version post-installation.\n\nSafety Note: Only use Arcade GEX firmware on compatible units. Incorrect firmware can cause system failure. Always back up existing data."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Using PKG Linker for PS3</h3>
+            <p>Learn to use PKG Linker to install homebrew packages on PS3 with HFW 4.92.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Using PKG Linker for PS3",
+              "tutorial": "PKG Linker allows you to install homebrew .PKG files on a PS3 running Hybrid Firmware (HFW) 4.92. Follow these steps:\n\n1. Ensure your PS3 is running HFW 4.92 (download from our ShopFW page).\n2. Download PKG Linker v1.3 or later from a trusted source and verify its integrity.\n3. Install PKG Linker on your PS3 via USB (place .PKG in root of FAT32 USB, install via Package Manager).\n4. On your PC, run the PKG Linker server application and configure your PS3’s IP address.\n5. Connect your PS3 to the same network, launch PKG Linker, and select packages to install.\n6. Follow prompts to transfer and install packages.\n\nSafety Note: Only install .PKG files from trusted sources to avoid malicious code. Ensure HFW compatibility to prevent system issues."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Installing PS Vita Testkit Firmware</h3>
+            <p>Step-by-step guide to flashing Testkit v3.60 on PS Vita PDEL-1000 units.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Installing PS Vita Testkit Firmware",
+              "tutorial": "Flashing Testkit firmware on a PS Vita PDEL-1000 requires precision. Follow these steps for v3.60:\n\n1. Confirm your unit is a PDEL-1000 Testkit, not a retail PS Vita.\n2. Download Testkit v3.60 firmware from our TestkitFW page and verify its MD5 hash.\n3. Install Content Manager Assistant (CMA) on your PC and connect your PS Vita via USB.\n4. Use QCMA or VitaShell to transfer the firmware file (.PUP) to the PS Vita.\n5. Boot the PS Vita into Safe Mode (power off, hold R + Power + PS button).\n6. Select ‘Update System Software’ and choose the USB option.\n7. Follow prompts to install the firmware.\n8. Verify the firmware version in Settings post-installation.\n\nSafety Note: Do not interrupt the update. Using Testkit firmware on retail Vitas will brick the device. Verify hardware compatibility."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Using Apollo Save Tool</h3>
+            <p>Manage save data on PS3 or PS Vita with Apollo Save Tool for homebrew.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Using Apollo Save Tool",
+              "tutorial": "Apollo Save Tool allows you to manage and modify save data on PS3 or PS Vita. Follow these steps:\n\n1. Ensure your PS3 is on HFW 4.92 or your PS Vita is on a compatible firmware (e.g., Testkit v3.60).\n2. Download Apollo Save Tool (.PKG for PS3, .VPK for Vita) from a trusted source.\n3. Install the tool via Package Manager (PS3) or VitaShell (Vita).\n4. Launch Apollo Save Tool and select a save file from your console’s storage.\n5. Use options to back up, restore, or modify save data (e.g., resign saves for another user).\n6. Export modified saves to USB for backup.\n\nSafety Note: Always back up original save data before modifying. Use trusted .PKG/.VPK files to avoid system instability."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Installing Rebug CFW on PS3</h3>
+            <p>Guide to installing Rebug 4.90 CFW on compatible PS3 models.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Installing Rebug CFW on PS3",
+              "tutorial": "Rebug 4.90 CFW enables advanced homebrew features on PS3. Follow these steps:\n\n1. Confirm your PS3 is compatible (e.g., CECH-2500 or earlier, downgradable to 3.55).\n2. Download Rebug 4.90 CFW from a trusted source and verify its MD5 hash.\n3. Format a USB drive to FAT32 and create a folder structure: PS3/UPDATE.\n4. Copy the Rebug firmware file (PS3UPDAT.PUP) to the UPDATE folder.\n5. Boot your PS3 into Recovery Mode (power off, hold power button until second beep).\n6. Insert the USB and select ‘System Update’ from the Recovery Menu.\n7. Follow prompts to install Rebug CFW.\n8. Enable QA Flag via Rebug Toolbox for full functionality.\n\nSafety Note: Incorrect installation can brick your PS3. Only use on compatible models and verify firmware authenticity."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Using SFlash Tool for PS3</h3>
+            <p>Learn to use SFlash Tool to manage PS3 system flash data.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Using SFlash Tool for PS3",
+              "tutorial": "SFlash Tool allows advanced users to manage PS3 system flash data (e.g., NAND/NOR). Follow these steps:\n\n1. Ensure your PS3 is on a compatible CFW (e.g., Rebug 4.90) or DECR firmware.\n2. Download SFlash Tool from a trusted source and verify its integrity.\n3. Install SFlash Tool via Package Manager on your PS3.\n4. Back up your NAND/NOR flash using a hardware flasher (e.g., E3 Flasher) before proceeding.\n5. Launch SFlash Tool and select the desired operation (e.g., dump flash, patch IDPS).\n6. Follow on-screen prompts and save output to USB.\n\nSafety Note: Incorrect use of SFlash Tool can brick your PS3. Always create a full NAND/NOR backup and proceed with caution."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Setting Up multiMAN on PS3</h3>
+            <p>Install and configure multiMAN for game backups and homebrew.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Setting Up multiMAN on PS3",
+              "tutorial": "multiMAN is a popular homebrew app for PS3 game backups and management. Follow these steps:\n\n1. Ensure your PS3 is running CFW or HFW 4.92.\n2. Download multiMAN (latest version, e.g., 4.85) from a trusted source and verify its integrity.\n3. Place the multiMAN .PKG file in the root of a FAT32 USB drive.\n4. Install multiMAN via Package Manager on your PS3.\n5. Launch multiMAN and configure settings (e.g., game paths, FTP server).\n6. Use multiMAN to back up games to internal/external HDD or manage homebrew apps.\n\nSafety Note: Only use trusted .PKG files. Ensure your PS3 is compatible with CFW/HFW to avoid issues."
+            }'>Read More</button>
+          </div>
+          <div class="guide-item">
+            <h3>Backing Up PS3 NAND/NOR</h3>
+            <p>Guide to creating a NAND/NOR backup for PS3 preservation.</p>
+            <button class="info-btn" data-guide='{
+              "title": "Backing Up PS3 NAND/NOR",
+              "tutorial": "Backing up your PS3’s NAND or NOR flash is essential for preservation and recovery. Follow these steps:\n\n1. Confirm your PS3 model (NAND for CECH-A/B, NOR for CECH-C and later).\n2. Obtain a hardware flasher (e.g., E3 Flasher, Teensy++ 2.0) compatible with your PS3.\n3. Download a trusted NAND/NOR dumper tool (e.g., NORway, NAND Flasher) and verify its integrity.\n4. Install the flasher according to its manual and connect it to your PS3’s flash chip.\n5. Run the dumper tool via CFW or DECR firmware to create a backup.\n6. Save the backup to a USB drive and store multiple copies securely.\n7. Verify the backup’s integrity using MD5 hash checks.\n\nSafety Note: Improper flashing can brick your PS3. Follow flasher instructions precisely and store backups securely."
+            }'>Read More</button>
+          </div>
+        </div>
+        <p style="margin-top: 16px;">Need help with a guide? Join our community for support!</p>
+        <a href="https://discord.gg/your-invite-code" class="discord-btn" target="_blank" rel="noopener noreferrer">Join Our Discord</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 10px;">
+          <div class="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="8" width="7" height="7" rx="2" fill="white" fill-opacity=".9"/>
+              <circle cx="17" cy="12" r="4" fill="white" fill-opacity=".9"/>
+            </svg>
+          </div>
+          <span>Prelaun.ch</span>
+        </div>
+        <p class="mini">Restoring PlayStation history responsibly. © <span id="y"></span> • All trademarks are property of their respective owners.</p>
+      </div>
+      <div>
+        <strong>Explore</strong>
+        <ul class="mini">
+          <li><a href="#mission">Mission</a></li>
+          <li><a href="#restorations">Restorations</a></li>
+          <li><a href="#join">Get Involved</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong>Contact</strong>
+        <ul class="mini">
+          <li><a href="mailto:playstationpreservation@gmail.com">Tips</a></li>
+          <li><a href="https://discord.gg/your-invite-code">Community</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="guide-modal">
+    <div class="modal-content">
+      <button class="close-btn">&times;</button>
+      <h3 id="modal-title"></h3>
+      <p id="modal-tutorial"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const modal = document.getElementById('guide-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalTutorial = document.getElementById('modal-tutorial');
+    const closeBtn = document.querySelector('.close-btn');
+    const infoButtons = document.querySelectorAll('.info-btn');
+
+    infoButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const data = JSON.parse(button.getAttribute('data-guide'));
+        modalTitle.textContent = data.title;
+        modalTutorial.textContent = data.tutorial;
+        modal.style.display = 'flex';
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
